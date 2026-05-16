@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小小汉字勇士</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <main class="layout">
+        <aside class="panel sidebar">
+          <div class="game-title">
+            <p class="eyebrow">小小汉字勇士</p>
+            <h1>今天练字</h1>
+            <strong id="current-level-label" class="current-level">第 1 关</strong>
+          </div>
+
+          <div class="progress-strip" aria-label="学习进度">
+            <div class="stat">
+              <span>会认</span>
+              <strong id="mastered-count">0 / 2500</strong>
+            </div>
+            <div class="stat">
+              <span>星星</span>
+              <strong id="reward-stars">0</strong>
+            </div>
+            <div class="stat">
+              <span>错题</span>
+              <strong id="review-count">0</strong>
+            </div>
+            <div class="stat">
+              <span>贴纸</span>
+              <strong id="sticker-count">0</strong>
+            </div>
+          </div>
+
+          <div class="panel-heading map-heading">
+            <h2>选一关</h2>
+            <button id="reset-progress" class="ghost-button">重置进度</button>
+          </div>
+          <div id="level-grid" class="level-grid"></div>
+        </aside>
+
+        <section class="lesson-panel">
+          <div class="panel-heading lesson-heading">
+            <div>
+              <h2 id="lesson-title">第 1 关 · 启蒙字</h2>
+              <p id="lesson-subtitle" class="panel-copy"></p>
+            </div>
+            <div class="action-row">
+              <button id="practice-review" class="ghost-button">练错题</button>
+              <button id="shuffle-level" class="primary-button">换一个字</button>
+            </div>
+          </div>
+
+          <section class="stage-overview" aria-labelledby="stage-overview-title">
+            <div class="stage-overview-header">
+              <h3 id="stage-overview-title">本关 20 字</h3>
+              <span id="stage-overview-progress" class="stage-overview-progress">已会 0 / 20</span>
+            </div>
+            <div class="level-progress-track" aria-hidden="true">
+              <div id="level-progress-fill" class="level-progress-fill"></div>
+            </div>
+            <div id="stage-overview-grid" class="stage-overview-grid"></div>
+          </section>
+
+          <section class="focus-card">
+            <div class="character-wrap">
+              <div id="focus-character" class="character">人</div>
+              <div class="character-meta">
+                <div>
+                  <span class="meta-label">拼音</span>
+                  <strong id="focus-pinyin">ren2</strong>
+                </div>
+                <div>
+                  <span class="meta-label">笔画</span>
+                  <strong id="focus-strokes">2 画</strong>
+                </div>
+                <div>
+                  <span class="meta-label">组词</span>
+                  <strong id="focus-word">大人</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="practice-grid">
+              <article class="practice-box">
+                <h3>认一认</h3>
+                <p id="meaning-text">看看这个字，先大声读出来。</p>
+              </article>
+              <article class="practice-box">
+                <h3>写一写</h3>
+                <p id="writing-tip">按提示描红：先撇，再捺。</p>
+              </article>
+              <article class="practice-box">
+                <h3>想一想</h3>
+                <p id="memory-tip">把这个字放进句子里，说一句自己的话。</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="dashboard-grid">
+            <section class="panel inner-panel">
+              <div class="panel-heading">
+                <div>
+                  <h3>开始闯关</h3>
+                  <p id="pool-summary" class="panel-copy">看大字，选正确拼音。</p>
+                </div>
+                <div class="phase-pill" id="phase-pill">普通关</div>
+              </div>
+              <div class="quiz-header">
+                <div>
+                  <h3>选拼音</h3>
+                  <p id="quiz-progress">已会 0 / 20</p>
+                </div>
+                <div class="score-pill">
+                  剩余 <strong id="quiz-score">20</strong>
+                </div>
+              </div>
+
+              <div id="quiz-start-panel" class="quiz-start-panel">
+                <div>
+                  <strong>先看看这 20 个字</strong>
+                  <p>准备好了，就开始闯关。每个字答对一次就会变绿色。</p>
+                </div>
+                <button id="start-quiz" class="primary-button">开始闯关</button>
+              </div>
+
+              <div id="question-card" class="question-card">
+                <p id="question-type" class="question-type">选正确拼音</p>
+                <div id="question-prompt" class="question-prompt">人</div>
+                <div id="question-options" class="option-grid"></div>
+              </div>
+
+              <div id="quiz-actions" class="quiz-actions">
+                <p id="feedback-text" class="feedback-text">答完后继续前进。</p>
+                <button id="next-question" class="primary-button" disabled>下一题</button>
+              </div>
+            </section>
+
+            <section class="panel inner-panel">
+              <div class="panel-heading">
+                <div>
+                  <h3>错题本</h3>
+                  <p class="panel-copy">答错的字会自动放在这里。</p>
+                </div>
+                <button id="print-review" class="ghost-button">打印练习页</button>
+              </div>
+
+              <div class="review-stats">
+                <div class="review-stat">
+                  <span>待复习</span>
+                  <strong id="review-book-total">0 个字</strong>
+                </div>
+                <div class="review-stat">
+                  <span>优先练习</span>
+                  <strong id="review-priority">暂无</strong>
+                </div>
+              </div>
+
+              <div id="review-book-list" class="review-book-list"></div>
+            </section>
+          </section>
+
+          <section class="panel reward-panel">
+            <div class="panel-heading">
+              <div>
+                <h3>小游戏乐园</h3>
+                <p id="reward-status" class="panel-copy">
+                  本关 20 个字都会了，就能选择小游戏。
+                </p>
+              </div>
+              <div id="mini-game-choice" class="mini-game-choice">
+                <button id="start-bubble" class="primary-button game-choice-button" disabled>
+                  <strong>汉字泡泡</strong>
+                  <span>点正确泡泡</span>
+                </button>
+                <button id="start-catch" class="ghost-button game-choice-button" disabled>
+                  <strong>接宝箱</strong>
+                  <span>左右接汉字</span>
+                </button>
+                <button id="start-reward" class="ghost-button game-choice-button" disabled>
+                  <strong>贪食蛇</strong>
+                  <span>方向键挑战</span>
+                </button>
+              </div>
+            </div>
+            <div class="treasure-board">
+              <div class="treasure-header">
+                <div>
+                  <p class="panel-copy" id="treasure-intro">小游戏规则：看大拼音，选择对应汉字。泡泡用点击，宝箱用左右键，贪食蛇用方向键。</p>
+                  <strong id="treasure-target" class="snake-target-pinyin">等待开始</strong>
+                </div>
+                <div class="snake-game-meta">
+                  <div class="score-pill">进度 <strong id="treasure-progress">0 / 6</strong></div>
+                  <div class="score-pill">生命 <strong id="snake-lives">3</strong></div>
+                  <label id="snake-hard-mode-wrap" class="snake-toggle">
+                    <input id="snake-hard-mode" type="checkbox" checked />
+                    <span>困难模式</span>
+                  </label>
+                </div>
+              </div>
+              <div class="treasure-grid" id="treasure-grid"></div>
+              <div id="snake-controls" class="snake-controls" aria-label="小游戏方向控制">
+                <button id="snake-up" class="ghost-button" type="button">上</button>
+                <div>
+                  <button id="snake-left" class="ghost-button" type="button">左</button>
+                  <button id="snake-down" class="ghost-button" type="button">下</button>
+                  <button id="snake-right" class="ghost-button" type="button">右</button>
+                </div>
+              </div>
+              <p class="feedback-text" id="treasure-feedback">过关后会获得星星和贴纸。</p>
+            </div>
+            <div class="reward-strip" id="reward-strip">
+              <div class="reward-badge">星星</div>
+              <div class="reward-badge">贴纸</div>
+              <div class="reward-badge">下一关</div>
+            </div>
+            <div class="sticker-panel">
+              <h4>贴纸收藏册</h4>
+              <div class="sticker-list" id="sticker-list"></div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <section id="print-sheet" class="print-sheet">
+      <div class="print-page">
+        <header class="print-header">
+          <h1>小小汉字勇士复习本</h1>
+          <p id="print-summary">把不会的字贴在墙上，每天读一读、写一写。</p>
+        </header>
+        <div id="print-grid" class="print-grid"></div>
+      </div>
+    </section>
+
+    <script src="./word-data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
