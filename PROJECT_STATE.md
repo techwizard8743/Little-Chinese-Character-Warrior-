@@ -83,6 +83,7 @@ The fake group-word issue was addressed:
 - `严` now maps to `严格`.
 - Real group words have been curated through all 125 levels / character id 2500.
 - Latest curated batches filled levels 49-125 and added pinyin corrections for `帖 -> tiè`, `幢 -> zhuàng`, `弹 -> tán`, `拧 -> nǐng`, `掺 -> chān`, `沈 -> shěn`, `爪 -> zhuǎ`, `甚 -> shèn`, `甸 -> diàn`, `瞭 -> liào`, `绩 -> jì`, `绷 -> bēng`, and `罗 -> luó`.
+- A child-friendliness vocabulary pass softened several serious or adult examples while preserving the target character, such as `死亡 -> 死角`, `毒药 -> 消毒`, `焚烧 -> 焚香`, `硝烟 -> 硝石`, `罢工 -> 罢手`, and `犯罪 -> 罪过`.
 - All `组词` entries currently include the target character.
 - There are no remaining placeholder entries.
 
@@ -128,10 +129,9 @@ Git is not available in the normal PATH on this machine. If needed, use GitHub D
 
 ## Recommended Next Steps
 
-1. Commit and push the completed `组词` curation batch.
-2. Do a child-friendliness pass on curated words and replace any examples that feel too adult, rare, or abstract.
-3. Playtest several late levels to make sure the quiz and three mini-games still feel smooth with the newly curated data.
-4. Consider adding a small review/edit workflow later if the user wants to fine-tune vocabulary by age group.
+1. Commit and push the completed `组词` curation and child-friendliness batch.
+2. Playtest several late levels to make sure the quiz and three mini-games still feel smooth with the newly curated data.
+3. Consider adding a small review/edit workflow later if the user wants to fine-tune vocabulary by age group.
 
 ## Fresh Session Prompt
 
