@@ -81,19 +81,14 @@ The fake group-word issue was addressed:
 - The generator no longer creates fake entries like `X字` or `X词`.
 - Unknown group words show `待补词语` honestly instead of pretending to be real words.
 - `严` now maps to `严格`.
-- Real group words have been curated through level 96 / character id 1920.
-- Latest curated batches filled levels 49-96 and added pinyin corrections for `帖 -> tiè`, `幢 -> zhuàng`, `弹 -> tán`, `拧 -> nǐng`, `掺 -> chān`, and `沈 -> shěn`.
-- All non-placeholder `组词` entries currently include the target character.
-- Current first remaining placeholder:
+- Real group words have been curated through all 125 levels / character id 2500.
+- Latest curated batches filled levels 49-125 and added pinyin corrections for `帖 -> tiè`, `幢 -> zhuàng`, `弹 -> tán`, `拧 -> nǐng`, `掺 -> chān`, `沈 -> shěn`, `爪 -> zhuǎ`, `甚 -> shèn`, `甸 -> diàn`, `瞭 -> liào`, `绩 -> jì`, `绷 -> bēng`, and `罗 -> luó`.
+- All `组词` entries currently include the target character.
+- There are no remaining placeholder entries.
 
 ```text
-Level 97, id 1921: 炕 / kàng / 待补词语
-```
-
-Current placeholder count:
-
-```text
-580 remaining 待补词语 entries
+0 remaining 待补词语 entries
+0 remaining X字-style placeholder entries
 ```
 
 ## Current Uncommitted Work
@@ -101,9 +96,6 @@ Current placeholder count:
 As of this note, these files have local modifications:
 
 ```text
-app.js
-index.html
-styles.css
 tools/generate-word-data.js
 word-data.js
 PROJECT_STATE.md
@@ -125,7 +117,7 @@ node tools\generate-word-data.js
 Count remaining placeholder group words:
 
 ```powershell
-node -e "global.window={}; require('./word-data.js'); const pending=String.fromCharCode(0x5f85,0x8865,0x8bcd,0x8bed); const rows=window.CHINESE_GAME_DATA.flatMap(level=>level.characters.map(c=>({level:level.id,id:c.id,hanzi:c.hanzi,pinyin:c.pinyin,word:c.word}))); const first=rows.find(c=>c.word===pending); console.log(JSON.stringify({levels:window.CHINESE_GAME_DATA.length,total:rows.length,pending:rows.filter(c=>c.word===pending).length,firstPending:first}, null, 2));"
+node -e "global.window={}; require('./word-data.js'); const rows=window.CHINESE_GAME_DATA.flatMap(level=>level.characters.map(c=>({level:level.id,id:c.id,hanzi:c.hanzi,pinyin:c.pinyin,word:c.word}))); const pending=rows.filter(c=>c.word==='待补词语'||c.word===c.hanzi+'字'); const noSelf=rows.filter(c=>c.word&&!c.word.includes(c.hanzi)); console.log(JSON.stringify({levels:window.CHINESE_GAME_DATA.length,total:rows.length,pendingStyle:pending.length,firstPendingStyle:pending[0]||null,noSelf:noSelf.length,firstNoSelf:noSelf[0]||null}, null, 2));"
 ```
 
 Git is not available in the normal PATH on this machine. If needed, use GitHub Desktop's bundled Git:
@@ -136,10 +128,10 @@ Git is not available in the normal PATH on this machine. If needed, use GitHub D
 
 ## Recommended Next Steps
 
-1. Continue replacing `待补词语` from level 97 onward.
+1. Commit and push the completed `组词` curation batch.
 2. Do a child-friendliness pass on curated words and replace any examples that feel too adult, rare, or abstract.
-3. Commit and push after each meaningful batch so GitHub Pages stays easy to recover.
-4. Consider adding a small in-app label for `待补词语` entries later, or temporarily hiding the `组词` line when no real word is available.
+3. Playtest several late levels to make sure the quiz and three mini-games still feel smooth with the newly curated data.
+4. Consider adding a small review/edit workflow later if the user wants to fine-tune vocabulary by age group.
 
 ## Fresh Session Prompt
 
@@ -149,5 +141,5 @@ Use this if starting a new thread or switching OpenAI accounts:
 Open this project:
 C:\Users\leene\Documents\GitHub\Little-Chinese-Character-Warrior-
 
-Read PROJECT_STATE.md first. Then inspect git status and continue from the current local files. The next task is probably to continue replacing 待补词语 from level 97 onward, unless I ask for something else.
+Read PROJECT_STATE.md first. Then inspect git status and continue from the current local files. The 组词 curation is complete for all 2,500 characters. The next task is probably a child-friendliness vocabulary pass, playtesting, or publishing the latest batch, unless I ask for something else.
 ```
