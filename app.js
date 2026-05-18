@@ -87,11 +87,7 @@ const elements = {
   stageOverviewGrid: document.getElementById("stage-overview-grid"),
   focusCharacter: document.getElementById("focus-character"),
   focusPinyin: document.getElementById("focus-pinyin"),
-  focusStrokes: document.getElementById("focus-strokes"),
   focusWord: document.getElementById("focus-word"),
-  meaningText: document.getElementById("meaning-text"),
-  writingTip: document.getElementById("writing-tip"),
-  memoryTip: document.getElementById("memory-tip"),
   questionType: document.getElementById("question-type"),
   questionPrompt: document.getElementById("question-prompt"),
   questionOptions: document.getElementById("question-options"),
@@ -524,11 +520,7 @@ function renderCurrentLevel() {
   elements.lessonSubtitle.textContent = `本关 ${levelCharacters.length} 个字。全部会认后，选择泡泡、宝箱或贪食蛇。`;
   elements.focusCharacter.textContent = focus.hanzi;
   elements.focusPinyin.textContent = formatPinyin(focus.pinyin);
-  elements.focusStrokes.textContent = focus.strokes ? `${focus.strokes} 画` : "待补";
   elements.focusWord.textContent = focus.word;
-  elements.meaningText.textContent = focus.meaning;
-  elements.writingTip.textContent = focus.writingTip;
-  elements.memoryTip.textContent = focus.memoryTip;
   elements.poolSummary.textContent = "每个字都要答对一次。答错会回到队伍里，等一下再练。";
   elements.shuffleLevel.textContent = isLevelComplete(level) && level.id < state.progress.unlockedLevel
     ? "去下一关"

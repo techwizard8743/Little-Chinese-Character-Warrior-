@@ -149,7 +149,6 @@ p {
 .panel-heading,
 .quiz-header,
 .quiz-actions,
-.character-wrap,
 .action-row,
 .review-stats,
 .treasure-header {
@@ -172,8 +171,7 @@ p {
 
 .panel-heading h2,
 .panel-heading h3,
-.sticker-panel h4,
-.practice-box h3 {
+.sticker-panel h4 {
   margin: 0;
 }
 
@@ -188,7 +186,6 @@ p {
 
 .level-grid,
 .dashboard-grid,
-.practice-grid,
 .option-grid,
 .review-book-list,
 .print-grid {
@@ -347,14 +344,9 @@ p {
 
 .focus-card {
   display: grid;
-  grid-template-columns: minmax(240px, 360px) minmax(0, 1fr);
+  grid-template-columns: minmax(260px, 380px) minmax(0, 1fr);
   gap: 18px;
   align-items: stretch;
-}
-
-.character-wrap {
-  align-items: stretch;
-  flex-direction: column;
 }
 
 .character {
@@ -388,12 +380,11 @@ p {
 
 .character-meta {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: 1fr;
+  gap: 14px;
 }
 
 .character-meta > div,
-.practice-box,
 .review-item,
 .review-stat,
 .treasure-board,
@@ -403,29 +394,19 @@ p {
   border: 1px solid var(--line);
 }
 
-.character-meta > div,
-.practice-box {
-  padding: 14px;
+.character-meta > div {
+  min-height: 118px;
+  padding: 20px;
+  display: grid;
+  align-content: center;
 }
 
 .character-meta strong {
   display: block;
-  margin-top: 4px;
-  font-size: 1.18rem;
-}
-
-.practice-grid {
-  grid-template-columns: 1fr;
-}
-
-.practice-box {
-  min-height: 92px;
-}
-
-.practice-box p {
-  margin: 8px 0 0;
-  color: var(--muted);
-  line-height: 1.55;
+  margin-top: 8px;
+  font-size: clamp(2.3rem, 5vw, 3.5rem);
+  line-height: 1.05;
+  color: var(--secondary-dark);
 }
 
 .dashboard-grid {
