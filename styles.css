@@ -842,6 +842,58 @@ p {
   outline: none;
 }
 
+.reward-effect {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.reward-effect.is-positioned {
+  inset: auto;
+  display: block;
+}
+
+.reward-effect-badge {
+  min-width: 104px;
+  min-height: 104px;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 999px;
+  border: 4px solid #ffffff;
+  box-shadow: 0 18px 36px rgba(31, 41, 55, 0.2);
+  animation: reward-pop 680ms ease-out forwards;
+}
+
+.reward-effect.is-positioned .reward-effect-badge {
+  transform: translate(-50%, -50%);
+}
+
+.reward-effect-badge strong {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.reward-effect-badge span {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.reward-effect.success .reward-effect-badge {
+  background: #16a34a;
+}
+
+.reward-effect.miss .reward-effect-badge {
+  background: #ef4444;
+  animation-name: reward-boom;
+}
+
 @keyframes bubble-float {
   from {
     transform: translate(-50%, 22px) scale(0.94);
@@ -851,6 +903,43 @@ p {
   to {
     transform: translate(-50%, -250px) scale(1.05);
     opacity: 0.2;
+  }
+}
+
+@keyframes reward-pop {
+  0% {
+    opacity: 0;
+    scale: 0.55;
+  }
+
+  35% {
+    opacity: 1;
+    scale: 1.14;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 0.92;
+  }
+}
+
+@keyframes reward-boom {
+  0% {
+    opacity: 0;
+    rotate: -8deg;
+    scale: 0.45;
+  }
+
+  35% {
+    opacity: 1;
+    rotate: 7deg;
+    scale: 1.2;
+  }
+
+  100% {
+    opacity: 0;
+    rotate: 0deg;
+    scale: 0.95;
   }
 }
 

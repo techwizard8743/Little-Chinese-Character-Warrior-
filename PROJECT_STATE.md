@@ -85,6 +85,9 @@ The fake group-word issue was addressed:
 - Latest curated batches filled levels 49-125 and added pinyin corrections for `帖 -> tiè`, `幢 -> zhuàng`, `弹 -> tán`, `拧 -> nǐng`, `掺 -> chān`, `沈 -> shěn`, `爪 -> zhuǎ`, `甚 -> shèn`, `甸 -> diàn`, `瞭 -> liào`, `绩 -> jì`, `绷 -> bēng`, and `罗 -> luó`.
 - A child-friendliness vocabulary pass softened several serious or adult examples while preserving the target character, such as `死亡 -> 死角`, `毒药 -> 消毒`, `焚烧 -> 焚香`, `硝烟 -> 硝石`, `罢工 -> 罢手`, and `犯罪 -> 罪过`.
 - A QA pass fixed stale mini-game feedback so 泡泡、接宝箱、贪食蛇 messages now follow the currently selected game instead of leaking from a previous game.
+- A game-mechanics pass fixed 接宝箱 wrong/bomb catches so the whole falling wave does not abruptly refresh, and changed 贪食蛇 easy-mode wrong-character hits to shrink the snake by one segment before costing a life.
+- 贪食蛇 now starts in easy mode by default; the child can still turn on 困难模式 with the toggle.
+- 汉字泡泡 and 接宝箱 now show short visual feedback: thumbs-up for correct actions and an explosion burst for wrong characters, bombs, or misses.
 - All `组词` entries currently include the target character.
 - There are no remaining placeholder entries.
 
@@ -99,7 +102,9 @@ As of this note, these files have local modifications:
 
 ```text
 app.js
+index.html
 PROJECT_STATE.md
+styles.css
 ```
 
 Before publishing, review in GitHub Desktop, commit, and push.
@@ -129,8 +134,8 @@ Git is not available in the normal PATH on this machine. If needed, use GitHub D
 
 ## Recommended Next Steps
 
-1. Commit and push the mini-game QA fix.
-2. Do a manual visual pass in the browser on a phone-sized window, especially the three mini-game boards.
+1. Manually test 接宝箱 wrong/bomb catches and 贪食蛇 easy-mode wrong-character hits in the browser.
+2. Commit and push the latest mini-game mechanics fix after the manual check feels right.
 3. Consider adding a small review/edit workflow later if the user wants to fine-tune vocabulary by age group.
 
 ## Fresh Session Prompt

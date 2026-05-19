@@ -16,6 +16,7 @@ const CATCH_END_ROW = 7;
 const CATCH_TICK_MS = 420;
 const MAX_REWARD_PLAYS = 3;
 const SNAKE_TICK_MS = 520;
+const REWARD_EFFECT_MS = 680;
 const SNAKE_DIRECTIONS = {
   up: { x: 0, y: -1 },
   down: { x: 0, y: 1 },
@@ -59,7 +60,7 @@ const state = {
   snakeLives: SNAKE_LIVES,
   snakeTargets: [],
   snakeMessage: "",
-  snakeHardMode: true,
+  snakeHardMode: false,
   snakeTimerId: null,
   bubbleLives: BUBBLE_LIVES,
   bubbleTargets: [],
@@ -69,7 +70,9 @@ const state = {
   catchTargets: [],
   catchBasketLane: Math.floor(CATCH_LANES / 2),
   catchMessage: "",
-  catchTimerId: null
+  catchTimerId: null,
+  rewardEffect: null,
+  rewardEffectTimerId: null
 };
 
 const elements = {
@@ -1034,6 +1037,7 @@ function stopRewardTimers() {
   stopSnakeTimer();
   stopBubbleTimer();
   stopCatchTimer();
+  clearRewardEffect();
 }
 
 function stopSnakeTimer() {
@@ -1055,6 +1059,53 @@ function stopCatchTimer() {
     window.clearInterval(state.catchTimerId);
     state.catchTimerId = null;
   }
+}
+
+function showRewardEffect(type, position = null, onDone = null) {
+  clearRewardEffect();
+  const id = Date.now();
+  state.rewardEffect = {
+    id,
+    type,
+    position,
+    icon: type === "success" ? "👍" : "💥",
+    text: type === "success" ? "太棒了" : "再试试"
+  };
+  renderRewardEffect();
+  state.rewardEffectTimerId = window.setTimeout(() => {
+    if (!state.rewardEffect || state.rewardEffect.id !== id) {
+      return;
+    }
+    state.rewardEffect = null;
+    state.rewardEffectTimerId = null;
+    removeRewardEffectElement();
+    if (onDone) {
+      onDone();
+    }
+  }, REWARD_EFFECT_MS);
+}
+
+function clearRewardEffect() {
+  if (state.rewardEffectTimerId) {
+    window.clearTimeout(state.rewardEffectTimerId);
+    state.rewardEffectTimerId = null;
+  }
+  state.rewardEffect = null;
+  removeRewardEffectElement();
+}
+
+function getPointerEffectPosition(event) {
+  if (!event || !elements.treasureGrid.getBoundingClientRect) {
+    return null;
+  }
+  const rect = elements.treasureGrid.getBoundingClientRect();
+  if (!rect.width || !rect.height) {
+    return null;
+  }
+  return {
+    left: ((event.clientX - rect.left) / rect.width) * 100,
+    top: ((event.clientY - rect.top) / rect.height) * 100
+  };
 }
 
 function setSnakeDirection(direction) {
@@ -1120,8 +1171,7 @@ function moveSnake() {
     return;
   }
 
-  state.snake.pop();
-  handleSnakeMiss(`吃到“${food.character.hanzi}”了，目标不是这个字。`);
+  handleSnakeWrongFood(food);
 }
 
 function handleSnakeMiss(message) {
@@ -1147,28 +1197,55 @@ function handleSnakeMiss(message) {
   renderTreasurePanel();
 }
 
-function handleBubblePick(character) {
+function handleSnakeWrongFood(food) {
+  const message = `吃到“${food.character.hanzi}”了，目标不是这个字。`;
+  if (state.snakeHardMode) {
+    state.snake.pop();
+    handleSnakeMiss(message);
+    return;
+  }
+
+  state.snake.pop();
+  if (state.snake.length > 1) {
+    state.snake.pop();
+  }
+
+  if (state.snake.length <= 1) {
+    handleSnakeMiss("小蛇太短了，少一颗心。");
+    return;
+  }
+
+  prepareTreasureRound();
+  state.snakeMessage = `${message} 小蛇短了一格。`;
+  renderTreasurePanel();
+}
+
+function handleBubblePick(option, event) {
   if (state.mode !== "treasure" || state.activeRewardGame !== "bubble" || !state.rewardGameStarted) {
     return;
   }
 
+  const character = option.character;
+  const effectPosition = getPointerEffectPosition(event);
   stopBubbleTimer();
   if (character.id === state.treasureTargetId) {
     state.treasureRound += 1;
     state.bubbleMessage = "点对了，泡泡变成星星了。";
 
     if (state.treasureRound >= BUBBLE_TARGET_COUNT) {
-      completeTreasureStage();
+      renderTreasurePanel();
+      showRewardEffect("success", effectPosition, completeTreasureStage);
       return;
     }
 
     prepareBubbleRound();
     renderTreasurePanel();
+    showRewardEffect("success", effectPosition);
     startBubbleTimer();
     return;
   }
 
-  handleBubbleMiss(`点到“${character.hanzi}”了，目标不是这个字。`);
+  handleBubbleMiss(`点到“${character.hanzi}”了，目标不是这个字。`, effectPosition);
 }
 
 function handleBubbleTimeout() {
@@ -1178,24 +1255,29 @@ function handleBubbleTimeout() {
   handleBubbleMiss("泡泡飘走了，少一颗心。");
 }
 
-function handleBubbleMiss(message) {
+function handleBubbleMiss(message, effectPosition = null) {
   state.bubbleLives -= 1;
 
   if (state.bubbleLives <= 0) {
     stopBubbleTimer();
-    state.mode = "treasure-ready";
-    state.rewardGameStarted = false;
-    state.bubbleMessage = "泡泡飞走了，再点“汉字泡泡”重新挑战。";
-    updatePhaseUI();
-    renderRewardPanel();
+    state.bubbleMessage = `${message} 没有心了。`;
     renderTreasurePanel();
-    renderQuizQuestion();
+    showRewardEffect("miss", effectPosition, () => {
+      state.mode = "treasure-ready";
+      state.rewardGameStarted = false;
+      state.bubbleMessage = "泡泡飞走了，再点“汉字泡泡”重新挑战。";
+      updatePhaseUI();
+      renderRewardPanel();
+      renderTreasurePanel();
+      renderQuizQuestion();
+    });
     return;
   }
 
   prepareBubbleRound();
   state.bubbleMessage = `${message} 还剩 ${state.bubbleLives} 颗心。`;
   renderTreasurePanel();
+  showRewardEffect("miss", effectPosition);
   startBubbleTimer();
 }
 
@@ -1234,9 +1316,18 @@ function moveCatchItems() {
 
   const missedTarget = landedItems.some((item) => item.kind === "word" && item.character.id === state.treasureTargetId);
   if (missedTarget) {
+    const targetItem = landedItems.find((item) => item.kind === "word" && item.character.id === state.treasureTargetId);
+    stopCatchTimer();
     state.catchMessage = "宝箱掉到地上了，再试一次。";
-    prepareCatchRound();
     renderTreasurePanel();
+    showRewardEffect("miss", targetItem ? getCatchItemEffectPosition(targetItem) : null, () => {
+      if (state.mode !== "treasure" || state.activeRewardGame !== "catch") {
+        return;
+      }
+      prepareCatchRound();
+      renderTreasurePanel();
+      startCatchTimer();
+    });
     return;
   }
 
@@ -1250,45 +1341,70 @@ function moveCatchItems() {
 }
 
 function handleCaughtItem(item) {
+  stopCatchTimer();
   if (item.kind === "bomb") {
-    handleCatchMiss("接到炸弹了，少一颗心。");
+    handleCatchMiss("接到炸弹了，少一颗心。", item);
     return;
   }
 
   if (item.character.id !== state.treasureTargetId) {
-    handleCatchMiss(`接到“${item.character.hanzi}”了，目标不是这个字。`);
+    handleCatchMiss(`接到“${item.character.hanzi}”了，目标不是这个字。`, item);
     return;
   }
 
+  const effectPosition = getCatchItemEffectPosition(item);
+  state.treasureOptions = state.treasureOptions.filter((option) => option !== item);
   state.treasureRound += 1;
   state.catchMessage = "接对了，宝箱打开了。";
+  renderTreasurePanel();
   if (state.treasureRound >= CATCH_TARGET_COUNT) {
-    completeTreasureStage();
+    showRewardEffect("success", effectPosition, completeTreasureStage);
     return;
   }
 
-  prepareCatchRound();
-  renderTreasurePanel();
+  showRewardEffect("success", effectPosition, () => {
+    if (state.mode !== "treasure" || state.activeRewardGame !== "catch") {
+      return;
+    }
+    prepareCatchRound();
+    renderTreasurePanel();
+    startCatchTimer();
+  });
 }
 
-function handleCatchMiss(message) {
+function handleCatchMiss(message, caughtItem = null) {
   state.catchLives -= 1;
+  const effectPosition = caughtItem ? getCatchItemEffectPosition(caughtItem) : null;
+  if (caughtItem) {
+    state.treasureOptions = state.treasureOptions.filter((item) => item !== caughtItem);
+  }
 
   if (state.catchLives <= 0) {
-    stopCatchTimer();
-    state.mode = "treasure-ready";
-    state.rewardGameStarted = false;
-    state.catchMessage = "篮子休息一下，再点“接宝箱”重新挑战。";
-    updatePhaseUI();
-    renderRewardPanel();
+    state.catchMessage = `${message} 没有心了。`;
     renderTreasurePanel();
-    renderQuizQuestion();
+    showRewardEffect("miss", effectPosition, () => {
+      state.mode = "treasure-ready";
+      state.rewardGameStarted = false;
+      state.catchMessage = "篮子休息一下，再点“接宝箱”重新挑战。";
+      updatePhaseUI();
+      renderRewardPanel();
+      renderTreasurePanel();
+      renderQuizQuestion();
+    });
     return;
   }
 
-  prepareCatchRound();
   state.catchMessage = `${message} 还剩 ${state.catchLives} 颗心。`;
+  if (!state.treasureOptions.some((item) => item.kind === "word" && item.character.id === state.treasureTargetId)) {
+    prepareCatchRound();
+  }
   renderTreasurePanel();
+  showRewardEffect("miss", effectPosition, () => {
+    if (state.mode !== "treasure" || state.activeRewardGame !== "catch") {
+      return;
+    }
+    startCatchTimer();
+  });
 }
 
 function completeTreasureStage() {
@@ -1532,7 +1648,7 @@ function renderBubblePanel() {
     bubble.style.height = `${option.size}px`;
     bubble.style.animationDelay = `${option.delay}s`;
     bubble.style.animationDuration = `${BUBBLE_ROUND_MS}ms`;
-    bubble.addEventListener("click", () => handleBubblePick(option.character));
+    bubble.addEventListener("click", (event) => handleBubblePick(option, event));
     elements.treasureGrid.appendChild(bubble);
   });
 }
@@ -1567,6 +1683,51 @@ function renderCatchPanel() {
   basket.textContent = "篮子";
   basket.style.left = `${getCatchLaneLeft(state.catchBasketLane)}%`;
   elements.treasureGrid.appendChild(basket);
+}
+
+function renderRewardEffect() {
+  removeRewardEffectElement();
+  if (!state.rewardEffect) {
+    return;
+  }
+
+  const effect = document.createElement("div");
+  effect.className = `reward-effect ${state.rewardEffect.type === "success" ? "success" : "miss"}`;
+  const position = state.rewardEffect.position;
+  if (
+    position
+    && Number.isFinite(position.left)
+    && Number.isFinite(position.top)
+  ) {
+    effect.classList.add("is-positioned");
+    effect.style.left = `${Math.max(8, Math.min(92, position.left))}%`;
+    effect.style.top = `${Math.max(8, Math.min(92, position.top))}%`;
+  }
+
+  const badge = document.createElement("div");
+  badge.className = "reward-effect-badge";
+
+  const icon = document.createElement("strong");
+  icon.textContent = state.rewardEffect.icon;
+
+  const label = document.createElement("span");
+  label.textContent = state.rewardEffect.text;
+
+  badge.appendChild(icon);
+  badge.appendChild(label);
+  effect.appendChild(badge);
+  elements.treasureGrid.appendChild(effect);
+}
+
+function removeRewardEffectElement() {
+  if (!elements.treasureGrid.querySelectorAll) {
+    return;
+  }
+  elements.treasureGrid.querySelectorAll(".reward-effect").forEach((effect) => {
+    if (effect.remove) {
+      effect.remove();
+    }
+  });
 }
 
 function renderSnakePanel() {
@@ -1623,6 +1784,13 @@ function getCatchLaneLeft(lane) {
 
 function getCatchRowTop(row) {
   return Math.max(-12, Math.min(86, ((row + 1) / (CATCH_END_ROW + 1)) * 100));
+}
+
+function getCatchItemEffectPosition(item) {
+  return {
+    left: getCatchLaneLeft(item.lane),
+    top: Math.max(12, Math.min(88, getCatchRowTop(item.row)))
+  };
 }
 
 function cellKey(cell) {
