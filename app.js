@@ -399,6 +399,34 @@ function getRewardTargetCount() {
   return SNAKE_TARGET_COUNT;
 }
 
+function clearRewardMessages() {
+  state.bubbleMessage = "";
+  state.catchMessage = "";
+  state.snakeMessage = "";
+}
+
+function setRewardMessage(gameType, message) {
+  if (gameType === "catch") {
+    state.catchMessage = message;
+    return;
+  }
+  if (gameType === "snake") {
+    state.snakeMessage = message;
+    return;
+  }
+  state.bubbleMessage = message;
+}
+
+function getActiveRewardMessage() {
+  if (state.activeRewardGame === "catch") {
+    return state.catchMessage;
+  }
+  if (state.activeRewardGame === "snake") {
+    return state.snakeMessage;
+  }
+  return state.bubbleMessage;
+}
+
 function recordMiniGameClear(gameType, levelId) {
   const countMap = getPlayCountMap(gameType);
   if (getRewardPlaysLeft(levelId) <= 0) {
@@ -832,8 +860,8 @@ function startTreasureStage(gameType = "bubble") {
     const message = playsLeft <= 0
       ? `本关小游戏已经玩满 ${MAX_REWARD_PLAYS} 次，可以去下一关。`
       : "本关 20 个字都会了，才能开始小游戏。";
-    state.snakeMessage = message;
-    state.bubbleMessage = message;
+    clearRewardMessages();
+    setRewardMessage(gameType, message);
     updatePhaseUI();
     renderRewardPanel();
     renderTreasurePanel();
@@ -848,6 +876,7 @@ function startTreasureStage(gameType = "bubble") {
   state.quizStarted = true;
   state.treasureRound = 0;
   state.treasureReward = null;
+  clearRewardMessages();
   const playNumber = getTotalRewardPlayCount(levelId) + 1;
 
   if (gameType === "bubble") {
@@ -1425,7 +1454,7 @@ function renderTreasurePanel() {
         ? `${rewardText}已玩 ${playCount} / ${MAX_REWARD_PLAYS} 次。可以选择泡泡、宝箱或贪食蛇再玩一次。`
         : `${rewardText}已玩满 ${MAX_REWARD_PLAYS} 次，可以去下一关。`;
     } else {
-      elements.treasureFeedback.textContent = state.bubbleMessage || state.catchMessage || state.snakeMessage || "过关后会获得星星和贴纸。";
+      elements.treasureFeedback.textContent = getActiveRewardMessage() || "过关后会获得星星和贴纸。";
     }
     return;
   }

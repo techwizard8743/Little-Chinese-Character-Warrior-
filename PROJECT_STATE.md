@@ -84,6 +84,7 @@ The fake group-word issue was addressed:
 - Real group words have been curated through all 125 levels / character id 2500.
 - Latest curated batches filled levels 49-125 and added pinyin corrections for `帖 -> tiè`, `幢 -> zhuàng`, `弹 -> tán`, `拧 -> nǐng`, `掺 -> chān`, `沈 -> shěn`, `爪 -> zhuǎ`, `甚 -> shèn`, `甸 -> diàn`, `瞭 -> liào`, `绩 -> jì`, `绷 -> bēng`, and `罗 -> luó`.
 - A child-friendliness vocabulary pass softened several serious or adult examples while preserving the target character, such as `死亡 -> 死角`, `毒药 -> 消毒`, `焚烧 -> 焚香`, `硝烟 -> 硝石`, `罢工 -> 罢手`, and `犯罪 -> 罪过`.
+- A QA pass fixed stale mini-game feedback so 泡泡、接宝箱、贪食蛇 messages now follow the currently selected game instead of leaking from a previous game.
 - All `组词` entries currently include the target character.
 - There are no remaining placeholder entries.
 
@@ -97,8 +98,7 @@ The fake group-word issue was addressed:
 As of this note, these files have local modifications:
 
 ```text
-tools/generate-word-data.js
-word-data.js
+app.js
 PROJECT_STATE.md
 ```
 
@@ -129,8 +129,8 @@ Git is not available in the normal PATH on this machine. If needed, use GitHub D
 
 ## Recommended Next Steps
 
-1. Commit and push the completed `组词` curation and child-friendliness batch.
-2. Playtest several late levels to make sure the quiz and three mini-games still feel smooth with the newly curated data.
+1. Commit and push the mini-game QA fix.
+2. Do a manual visual pass in the browser on a phone-sized window, especially the three mini-game boards.
 3. Consider adding a small review/edit workflow later if the user wants to fine-tune vocabulary by age group.
 
 ## Fresh Session Prompt
