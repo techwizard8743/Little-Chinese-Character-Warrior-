@@ -205,6 +205,26 @@
       </main>
     </div>
 
+    <section id="debug-panel" class="debug-panel" hidden aria-label="测试模式">
+      <div class="debug-header">
+        <div>
+          <strong>测试模式</strong>
+          <span id="debug-summary">第 1 关</span>
+        </div>
+        <a class="debug-exit" href="./index.html">退出</a>
+      </div>
+      <label class="debug-field">
+        <span>关卡</span>
+        <input id="debug-level" type="number" min="1" max="125" value="1" />
+      </label>
+      <div class="debug-actions">
+        <button id="debug-jump-level" class="ghost-button" type="button">跳到关卡</button>
+        <button id="debug-unlock-level" class="ghost-button" type="button">解锁到这里</button>
+        <button id="debug-master-level" class="primary-button" type="button">本关已会</button>
+        <button id="debug-replay-games" class="ghost-button" type="button">重测小游戏</button>
+      </div>
+    </section>
+
     <section id="print-sheet" class="print-sheet">
       <div class="print-page">
         <header class="print-header">

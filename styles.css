@@ -506,6 +506,86 @@ p {
   display: none !important;
 }
 
+.debug-panel {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 30;
+  width: min(360px, calc(100vw - 24px));
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+  border: 2px solid #93c5fd;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18px 40px rgba(31, 41, 55, 0.18);
+}
+
+.debug-panel[hidden] {
+  display: none;
+}
+
+.debug-header,
+.debug-field,
+.debug-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.debug-header {
+  grid-template-columns: 1fr auto;
+  align-items: start;
+}
+
+.debug-header strong,
+.debug-header span,
+.debug-field span {
+  display: block;
+}
+
+.debug-header strong {
+  font-size: 1.05rem;
+}
+
+.debug-header span,
+.debug-field span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.debug-exit {
+  padding: 8px 10px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  font-weight: 800;
+  text-decoration: none;
+  background: #ffffff;
+}
+
+.debug-field input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  font: inherit;
+  font-weight: 800;
+}
+
+.debug-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.debug-actions .primary-button,
+.debug-actions .ghost-button {
+  min-height: 44px;
+  padding: 9px 10px;
+  border-radius: 12px;
+}
+
 .question-type {
   margin: 0;
   font-weight: 800;
@@ -1184,6 +1264,16 @@ p {
     height: 44px;
   }
 
+  .debug-panel {
+    right: 9px;
+    bottom: 9px;
+    width: calc(100vw - 18px);
+  }
+
+  .debug-actions {
+    grid-template-columns: 1fr;
+  }
+
   .snake-controls .ghost-button {
     width: 44px;
     min-height: 38px;
@@ -1221,6 +1311,10 @@ p {
 }
 
 @media print {
+  .debug-panel {
+    display: none !important;
+  }
+
   body * {
     visibility: hidden;
   }

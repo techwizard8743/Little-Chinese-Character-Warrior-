@@ -1,6 +1,7 @@
 const STORAGE_KEY = "hanzi-hero-progress-v5";
 const LEGACY_STORAGE_KEY = "hanzi-hero-progress-v4";
 const levels = window.CHINESE_GAME_DATA;
+const DEBUG_MODE = new URLSearchParams(window.location.search).has("debug");
 const CHARACTERS_PER_LEVEL = 20;
 const TOTAL_CHARACTERS = levels.reduce((total, level) => total + level.characters.length, 0);
 const SNAKE_GRID_SIZE = 10;
@@ -132,13 +133,21 @@ const elements = {
   snakeDown: document.getElementById("snake-down"),
   snakeLeft: document.getElementById("snake-left"),
   snakeRight: document.getElementById("snake-right"),
-  stickerList: document.getElementById("sticker-list")
+  stickerList: document.getElementById("sticker-list"),
+  debugPanel: document.getElementById("debug-panel"),
+  debugSummary: document.getElementById("debug-summary"),
+  debugLevel: document.getElementById("debug-level"),
+  debugJumpLevel: document.getElementById("debug-jump-level"),
+  debugUnlockLevel: document.getElementById("debug-unlock-level"),
+  debugMasterLevel: document.getElementById("debug-master-level"),
+  debugReplayGames: document.getElementById("debug-replay-games")
 };
 
 initialize();
 
 function initialize() {
   attachEvents();
+  setupDebugMode();
   elements.snakeHardMode.checked = state.snakeHardMode;
   selectLevel(Math.min(state.progress.unlockedLevel, levels.length));
   updateHeaderStats();
@@ -288,6 +297,87 @@ function focusMiniGameChoices() {
   if (elements.startBubble.focus) {
     elements.startBubble.focus();
   }
+}
+
+function setupDebugMode() {
+  if (!DEBUG_MODE || !elements.debugPanel) {
+    return;
+  }
+
+  elements.debugPanel.hidden = false;
+  elements.debugLevel.max = String(levels.length);
+
+  elements.debugJumpLevel.addEventListener("click", () => {
+    selectLevel(getDebugLevelId());
+  });
+
+  elements.debugUnlockLevel.addEventListener("click", () => {
+    const levelId = getDebugLevelId();
+    state.progress.unlockedLevel = Math.max(state.progress.unlockedLevel, levelId);
+    saveProgress();
+    selectLevel(levelId);
+    updateHeaderStats();
+  });
+
+  elements.debugMasterLevel.addEventListener("click", () => {
+    markDebugLevelReady(getDebugLevelId());
+  });
+
+  elements.debugReplayGames.addEventListener("click", () => {
+    const levelId = getDebugLevelId();
+    markDebugLevelReady(levelId);
+    delete state.progress.bubblePlayCounts[levelId];
+    delete state.progress.catchPlayCounts[levelId];
+    delete state.progress.snakePlayCounts[levelId];
+    state.progress.pendingRewardLevel = state.progress.treasureClearedLevels.includes(levelId)
+      ? null
+      : levelId;
+    saveProgress();
+    selectLevel(levelId);
+    updateHeaderStats();
+    focusMiniGameChoices();
+  });
+}
+
+function getDebugLevelId() {
+  const inputValue = Number(elements.debugLevel?.value || state.selectedLevelId);
+  if (!Number.isFinite(inputValue)) {
+    return state.selectedLevelId;
+  }
+  return Math.max(1, Math.min(levels.length, Math.floor(inputValue)));
+}
+
+function markDebugLevelReady(levelId) {
+  const level = levels.find((item) => item.id === levelId) || levels[0];
+  state.progress.unlockedLevel = Math.max(state.progress.unlockedLevel, level.id);
+  level.characters.forEach((character) => {
+    if (!state.progress.masteredCharacters.includes(character.id)) {
+      state.progress.masteredCharacters.push(character.id);
+    }
+  });
+  if (!state.progress.completedLevels.includes(level.id)) {
+    state.progress.completedLevels.push(level.id);
+  }
+  if (!state.progress.treasureClearedLevels.includes(level.id)) {
+    state.progress.pendingRewardLevel = level.id;
+  }
+  saveProgress();
+  selectLevel(level.id);
+  updateHeaderStats();
+  focusMiniGameChoices();
+}
+
+function renderDebugPanel() {
+  if (!DEBUG_MODE || !elements.debugPanel) {
+    return;
+  }
+
+  const level = getCurrentLevel();
+  const knownCount = getKnownCount(level);
+  const playCount = getTotalRewardPlayCount(level.id);
+  const gameReady = isLevelComplete(level) ? "可测小游戏" : "学习中";
+  elements.debugLevel.value = String(level.id);
+  elements.debugSummary.textContent = `第 ${level.id} 关 · 已会 ${knownCount}/${level.characters.length} · ${gameReady} · 游戏 ${playCount}/${MAX_REWARD_PLAYS}`;
 }
 
 function defaultProgress() {
@@ -502,7 +592,7 @@ function renderLevelGrid() {
 
   levels.forEach((level) => {
     const button = document.createElement("button");
-    const isUnlocked = level.id <= state.progress.unlockedLevel;
+    const isUnlocked = DEBUG_MODE || level.id <= state.progress.unlockedLevel;
     const treasureDone = state.progress.treasureClearedLevels.includes(level.id);
     const knownCount = getKnownCount(level);
     button.className = `level-button${level.id === state.selectedLevelId ? " active" : ""}${isUnlocked ? "" : " locked"}`;
@@ -537,6 +627,7 @@ function selectLevel(levelId) {
   renderCurrentLevel();
   renderReviewBook();
   renderTreasurePanel();
+  renderDebugPanel();
 }
 
 function renderCurrentLevel() {
@@ -1920,6 +2011,7 @@ function updateHeaderStats() {
   elements.rewardStars.textContent = String(state.progress.rewardStars);
   elements.reviewCount.textContent = String(Object.keys(state.progress.reviewBook).length);
   elements.stickerCount.textContent = String(state.progress.stickers.length);
+  renderDebugPanel();
 }
 
 function uniqueCharacters(items) {
