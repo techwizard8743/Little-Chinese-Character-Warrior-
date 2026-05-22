@@ -90,6 +90,7 @@ The fake group-word issue was addressed:
 - 汉字泡泡 and 接宝箱 now show short visual feedback: thumbs-up for correct actions and an explosion burst for wrong characters, bombs, or misses.
 - A hidden parent/developer test mode was added. Open the app with `?debug=1` to jump levels, unlock through a level, mark the current level as mastered, or clear the current level's mini-game play counts for retesting.
 - `README.md` was refreshed for GitHub visitors with the live Pages link, current game behavior, progress-saving notes, and debug-mode instructions.
+- An iPhone polish pass moved the lesson/game flow above the long level map on narrow screens, tightened the learning cards, enlarged touch targets, kept the game pinyin header compact/sticky, added drag control for 接宝箱, and added swipe control for 贪食蛇.
 - All `组词` entries currently include the target character.
 - There are no remaining placeholder entries.
 
@@ -104,8 +105,6 @@ As of this note, the expected local modifications for the current task are:
 
 ```text
 app.js
-index.html
-README.md
 PROJECT_STATE.md
 styles.css
 ```
@@ -137,10 +136,11 @@ Git is not available in the normal PATH on this machine. If needed, use GitHub D
 
 ## Recommended Next Steps
 
-1. Manually test normal mode and `?debug=1` mode in the browser.
-2. Use debug mode to do a faster pass through all three mini-games at several levels.
-3. Commit and push the debug-mode and README update after the manual check feels right.
-4. Consider adding a small parent dashboard later if the user wants learning-record views.
+1. Manually test the iPhone layout using the live site or local file with `?debug=1`.
+2. On iPhone, verify 汉字泡泡 taps, 接宝箱 drag control, and 贪食蛇 swipe control.
+3. Commit and push the iPhone polish update after the manual check feels right.
+4. Next planned feature: add PWA support so parents can add the game to the iPhone home screen.
+5. iPad-specific layout customization is intentionally postponed.
 
 ## Fresh Session Prompt
 
@@ -150,5 +150,5 @@ Use this if starting a new thread or switching OpenAI accounts:
 Open this project:
 C:\Users\leene\Documents\GitHub\Little-Chinese-Character-Warrior-
 
-Read PROJECT_STATE.md first. Then inspect git status and continue from the current local files. The 组词 curation is complete for all 2,500 characters. A hidden `?debug=1` test mode and refreshed README were added recently. The next task is probably manual browser playtesting, committing/pushing the latest local changes, or improving the parent-facing progress view, unless I ask for something else.
+Read PROJECT_STATE.md first. Then inspect git status and continue from the current local files. The 组词 curation is complete for all 2,500 characters. A hidden `?debug=1` test mode and refreshed README were added. The latest local work is an iPhone polish pass with narrow-screen layout changes plus drag control for 接宝箱 and swipe control for 贪食蛇. The next task is probably manual iPhone playtesting, committing/pushing the latest local changes, or adding PWA support, unless I ask for something else.
 ```

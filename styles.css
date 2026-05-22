@@ -846,6 +846,13 @@ p {
   background-size: 20% 100%, 100% 100%;
 }
 
+.treasure-grid.catch-grid,
+.treasure-grid.snake-grid {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .catch-lane {
   position: absolute;
   top: 0;
@@ -913,6 +920,7 @@ p {
   animation-name: bubble-float;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
+  touch-action: manipulation;
 }
 
 .bubble-button:hover,
@@ -1190,14 +1198,37 @@ p {
 
 @media (max-width: 760px) {
   .app-shell {
-    width: min(100% - 18px, 100%);
-    padding-top: 10px;
+    width: min(100% - 14px, 100%);
+    padding: 8px 0 24px;
+  }
+
+  .layout {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lesson-panel {
+    order: 1;
+    gap: 12px;
+  }
+
+  .sidebar {
+    order: 2;
+    gap: 12px;
   }
 
   .panel,
+  .stage-overview,
+  .focus-card,
+  .question-card {
+    border-radius: 14px;
+  }
+
+  .panel,
+  .stage-overview,
   .focus-card {
-    padding: 14px;
-    border-radius: 16px;
+    padding: 12px;
   }
 
   .panel-heading,
@@ -1209,59 +1240,146 @@ p {
     align-items: stretch;
   }
 
+  .lesson-heading h2 {
+    font-size: 1.35rem;
+  }
+
+  .game-title h1 {
+    font-size: 1.55rem;
+  }
+
+  .progress-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat {
+    min-height: 62px;
+    padding: 10px;
+  }
+
+  .stat strong {
+    font-size: 1.08rem;
+  }
+
+  .focus-card {
+    gap: 12px;
+  }
+
+  .character {
+    min-height: 188px;
+    font-size: clamp(5.4rem, 31vw, 7.4rem);
+  }
+
+  .character::before {
+    inset: 9px;
+  }
+
+  .character-meta > div {
+    min-height: 86px;
+    padding: 14px;
+  }
+
+  .character-meta strong {
+    font-size: clamp(2rem, 10vw, 2.75rem);
+  }
+
+  .stage-overview {
+    gap: 10px;
+  }
+
+  .stage-character-tile {
+    min-height: 38px;
+    border-radius: 10px;
+    font-size: 1.18rem;
+  }
+
   .mini-game-choice {
     grid-template-columns: 1fr;
     min-width: 0;
   }
 
   .treasure-board {
-    padding: 12px;
+    padding: 10px;
   }
 
   .treasure-header {
-    top: 6px;
-    gap: 8px;
+    top: 0;
+    gap: 7px;
+    padding: 8px 9px;
+  }
+
+  .treasure-header .panel-copy {
+    display: none;
   }
 
   .snake-target-pinyin {
-    font-size: clamp(1.8rem, 10vw, 2.8rem);
+    margin-top: 0;
+    font-size: clamp(2.25rem, 12vw, 3.2rem);
+    text-align: center;
   }
 
   .snake-game-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     justify-items: stretch;
-    gap: 8px;
+    gap: 7px;
+  }
+
+  .snake-game-meta .score-pill {
+    text-align: center;
+  }
+
+  .snake-toggle {
+    grid-column: 1 / -1;
+    justify-self: center;
   }
 
   .treasure-grid {
-    width: min(100%, 360px);
-    max-width: clamp(260px, calc(100vh - 250px), 360px);
+    width: min(100%, 330px);
+    max-width: clamp(260px, calc(100vh - 248px), 330px);
+    max-width: clamp(260px, calc(100svh - 248px), 330px);
     gap: 3px;
     padding: 6px;
+    margin-top: 8px;
   }
 
   .game-ready-card {
-    min-height: 230px;
-    padding: 18px;
+    min-height: 210px;
+    padding: 16px;
+  }
+
+  .game-ready-card strong {
+    font-size: clamp(1.65rem, 9vw, 2.25rem);
+  }
+
+  .game-frame-start {
+    min-height: 54px;
   }
 
   .treasure-grid.bubble-grid {
-    width: min(100%, 360px);
-    height: clamp(250px, calc(100vh - 280px), 340px);
+    width: min(100%, 340px);
+    height: clamp(250px, calc(100vh - 285px), 330px);
+    height: clamp(250px, calc(100svh - 285px), 330px);
   }
 
   .treasure-grid.catch-grid {
-    width: min(100%, 360px);
-    height: clamp(260px, calc(100vh - 280px), 350px);
+    width: min(100%, 340px);
+    height: clamp(260px, calc(100vh - 285px), 340px);
+    height: clamp(260px, calc(100svh - 285px), 340px);
   }
 
   .catch-item {
-    width: 50px;
-    height: 50px;
+    width: 54px;
+    height: 54px;
   }
 
   .catch-basket {
-    width: 76px;
-    height: 44px;
+    width: 82px;
+    height: 48px;
+  }
+
+  .bubble-button {
+    min-width: 68px;
+    min-height: 68px;
   }
 
   .debug-panel {
@@ -1275,12 +1393,14 @@ p {
   }
 
   .snake-controls .ghost-button {
-    width: 44px;
-    min-height: 38px;
+    width: 54px;
+    min-height: 44px;
   }
 
-  .progress-strip,
-  .level-grid,
+  .level-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .option-grid,
   .print-grid,
   .sticker-list,
@@ -1298,11 +1418,21 @@ p {
   }
 
   .level-button {
-    min-height: 60px;
+    min-height: 54px;
+    padding: 8px;
+  }
+
+  .level-button strong {
+    font-size: 0.88rem;
   }
 
   .question-prompt {
     min-height: 126px;
+  }
+
+  .option-button {
+    min-height: 62px;
+    font-size: 1.1rem;
   }
 
   .review-item {

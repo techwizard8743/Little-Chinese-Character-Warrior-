@@ -18,6 +18,7 @@ const CATCH_TICK_MS = 420;
 const MAX_REWARD_PLAYS = 3;
 const SNAKE_TICK_MS = 520;
 const REWARD_EFFECT_MS = 680;
+const TOUCH_SWIPE_MIN = 24;
 const SNAKE_DIRECTIONS = {
   up: { x: 0, y: -1 },
   down: { x: 0, y: 1 },
@@ -73,7 +74,8 @@ const state = {
   catchMessage: "",
   catchTimerId: null,
   rewardEffect: null,
-  rewardEffectTimerId: null
+  rewardEffectTimerId: null,
+  touchStart: null
 };
 
 const elements = {
@@ -254,6 +256,10 @@ function attachEvents() {
     renderTreasurePanel();
   });
 
+  elements.treasureGrid.addEventListener("touchstart", handleTreasureTouchStart, { passive: false });
+  elements.treasureGrid.addEventListener("touchmove", handleTreasureTouchMove, { passive: false });
+  elements.treasureGrid.addEventListener("touchend", handleTreasureTouchEnd, { passive: false });
+
   window.addEventListener("keydown", (event) => {
     const keyDirections = {
       ArrowUp: "up",
@@ -378,6 +384,109 @@ function renderDebugPanel() {
   const gameReady = isLevelComplete(level) ? "可测小游戏" : "学习中";
   elements.debugLevel.value = String(level.id);
   elements.debugSummary.textContent = `第 ${level.id} 关 · 已会 ${knownCount}/${level.characters.length} · ${gameReady} · 游戏 ${playCount}/${MAX_REWARD_PLAYS}`;
+}
+
+function isTouchGameActive() {
+  return state.mode === "treasure"
+    && state.rewardGameStarted
+    && (state.activeRewardGame === "snake" || state.activeRewardGame === "catch");
+}
+
+function getTouchPoint(event) {
+  return event.touches?.[0] || event.changedTouches?.[0] || null;
+}
+
+function handleTreasureTouchStart(event) {
+  if (!isTouchGameActive()) {
+    return;
+  }
+
+  const point = getTouchPoint(event);
+  if (!point) {
+    return;
+  }
+
+  state.touchStart = {
+    x: point.clientX,
+    y: point.clientY,
+    handled: false
+  };
+
+  if (state.activeRewardGame === "catch") {
+    event.preventDefault();
+    moveCatchBasketToPoint(point.clientX);
+  }
+}
+
+function handleTreasureTouchMove(event) {
+  if (!isTouchGameActive()) {
+    return;
+  }
+
+  const point = getTouchPoint(event);
+  if (!point) {
+    return;
+  }
+
+  event.preventDefault();
+
+  if (state.activeRewardGame === "catch") {
+    moveCatchBasketToPoint(point.clientX);
+    return;
+  }
+
+  if (!state.touchStart) {
+    state.touchStart = { x: point.clientX, y: point.clientY, handled: false };
+    return;
+  }
+
+  const direction = getSwipeDirection(state.touchStart, point);
+  if (!direction) {
+    return;
+  }
+
+  setSnakeDirection(direction);
+  state.touchStart = {
+    x: point.clientX,
+    y: point.clientY,
+    handled: true
+  };
+}
+
+function handleTreasureTouchEnd(event) {
+  if (!isTouchGameActive()) {
+    state.touchStart = null;
+    return;
+  }
+
+  const point = getTouchPoint(event);
+  if (
+    point
+    && state.activeRewardGame === "snake"
+    && state.touchStart
+    && !state.touchStart.handled
+  ) {
+    const direction = getSwipeDirection(state.touchStart, point);
+    if (direction) {
+      setSnakeDirection(direction);
+    }
+  }
+
+  state.touchStart = null;
+}
+
+function getSwipeDirection(start, point) {
+  const dx = point.clientX - start.x;
+  const dy = point.clientY - start.y;
+  const absX = Math.abs(dx);
+  const absY = Math.abs(dy);
+  if (Math.max(absX, absY) < TOUCH_SWIPE_MIN) {
+    return null;
+  }
+  if (absX > absY) {
+    return dx > 0 ? "right" : "left";
+  }
+  return dy > 0 ? "down" : "up";
 }
 
 function defaultProgress() {
@@ -1097,7 +1206,7 @@ function beginRewardGame() {
   }
 
   if (state.activeRewardGame === "catch") {
-    state.catchMessage = "开始！左右移动篮子，接正确汉字。";
+    state.catchMessage = "开始！拖动篮子，接正确汉字。";
     renderRewardPanel();
     renderTreasurePanel();
     renderQuizQuestion();
@@ -1128,6 +1237,7 @@ function stopRewardTimers() {
   stopSnakeTimer();
   stopBubbleTimer();
   stopCatchTimer();
+  state.touchStart = null;
   clearRewardEffect();
 }
 
@@ -1385,6 +1495,29 @@ function moveCatchBasket(direction) {
     return;
   }
 
+  renderTreasurePanel();
+}
+
+function moveCatchBasketToPoint(clientX) {
+  if (state.mode !== "treasure" || state.activeRewardGame !== "catch" || !state.rewardGameStarted) {
+    return;
+  }
+  if (!elements.treasureGrid.getBoundingClientRect) {
+    return;
+  }
+
+  const rect = elements.treasureGrid.getBoundingClientRect();
+  if (!rect.width) {
+    return;
+  }
+
+  const percent = Math.max(0, Math.min(0.999, (clientX - rect.left) / rect.width));
+  const nextLane = Math.max(0, Math.min(CATCH_LANES - 1, Math.floor(percent * CATCH_LANES)));
+  if (nextLane === state.catchBasketLane) {
+    return;
+  }
+
+  state.catchBasketLane = nextLane;
   renderTreasurePanel();
 }
 
@@ -1648,7 +1781,7 @@ function renderTreasurePanel() {
   );
 
   if (state.mode !== "treasure") {
-    elements.treasureIntro.textContent = "小游戏规则：看大拼音，选择对应汉字。泡泡用点击，宝箱用左右键，贪食蛇用方向键。";
+    elements.treasureIntro.textContent = "小游戏规则：看大拼音，选择对应汉字。泡泡点击，宝箱拖动，贪食蛇滑动。";
     elements.treasureTarget.textContent = treasureDone && playsLeft > 0
       ? "再玩一次？"
       : treasureDone
@@ -1690,8 +1823,8 @@ function renderRewardGameReadyPanel() {
   const instructions = state.activeRewardGame === "bubble"
     ? "看清拼音，准备好后开始点泡泡。"
     : state.activeRewardGame === "catch"
-      ? "看清拼音，手放在左右键或 A/D 上，再开始接宝箱。"
-      : "看清拼音，手放在方向键或 WASD 上，再开始贪食蛇。";
+      ? "看清拼音，手指放在篮子上，再开始接宝箱。"
+      : "看清拼音，准备好滑动方向，再开始贪食蛇。";
 
   elements.treasureIntro.textContent = `${gameName}：准备好再开始，计时和移动会在开始后启动。`;
   elements.treasureTarget.textContent = target ? formatPinyin(target.pinyin) : "准备开始";
@@ -1746,12 +1879,12 @@ function renderBubblePanel() {
 
 function renderCatchPanel() {
   const target = findCharacterById(state.treasureTargetId);
-  elements.treasureIntro.textContent = "接宝箱：看拼音，左右移动篮子接正确汉字。接错字或炸弹会少一颗心。";
+  elements.treasureIntro.textContent = "接宝箱：看拼音，拖动篮子接正确汉字。接错字或炸弹会少一颗心。";
   elements.treasureTarget.textContent = target
     ? formatPinyin(target.pinyin)
     : "看拼音";
   elements.treasureGrid.innerHTML = "";
-  elements.treasureFeedback.textContent = state.catchMessage || "用左右键、A/D，或下面按钮移动篮子。";
+  elements.treasureFeedback.textContent = state.catchMessage || "拖动篮子，也可以用左右键或按钮。";
 
   for (let lane = 0; lane < CATCH_LANES; lane += 1) {
     const laneGuide = document.createElement("div");
@@ -1823,12 +1956,12 @@ function removeRewardEffectElement() {
 
 function renderSnakePanel() {
   const target = findCharacterById(state.treasureTargetId);
-  elements.treasureIntro.textContent = "贪食蛇：看拼音，控制小蛇吃掉对应汉字。吃对 6 个就过关。";
+  elements.treasureIntro.textContent = "贪食蛇：看拼音，滑动控制小蛇吃对应汉字。吃对 6 个就过关。";
   elements.treasureTarget.textContent = target
     ? formatPinyin(target.pinyin)
     : "看拼音";
   elements.treasureGrid.innerHTML = "";
-  elements.treasureFeedback.textContent = state.snakeMessage || "用方向键、WASD，或下面按钮控制小蛇。";
+  elements.treasureFeedback.textContent = state.snakeMessage || "滑动屏幕，也可以用方向键或按钮。";
 
   const snakeKeys = new Map(state.snake.map((cell, index) => [cellKey(cell), index]));
   const foodByCell = new Map(state.treasureOptions.map((food) => [cellKey(food.position), food]));
