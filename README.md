@@ -26,6 +26,7 @@ https://techwizard8743.github.io/Little-Chinese-Character-Warrior-/
 - 答错的字会进入错题本，并在后面继续出现
 - 错题本可以打印成 A4 练习页
 - 进度会保存在当前浏览器和设备中
+- 支持安装到手机或电脑主屏幕，并缓存核心文件供离线打开
 
 ## 小游戏
 
@@ -50,6 +51,12 @@ https://techwizard8743.github.io/Little-Chinese-Character-Warrior-/
 ```text
 C:\Users\leene\Documents\GitHub\Little-Chinese-Character-Warrior-\index.html
 ```
+
+## 安装到主屏幕
+
+在 iPhone 或 iPad 上，用 Safari 打开在线链接，点分享按钮，然后选择“添加到主屏幕”。以后可以像普通 App 一样从桌面打开。
+
+在 Chrome、Edge 等浏览器中，如果地址栏显示安装按钮，也可以直接安装到电脑或安卓设备。第一次在线打开后，核心页面和课程数据会缓存下来，之后没有网络时也能继续打开同一设备上的游戏。
 
 ## 家长和测试模式
 
@@ -94,6 +101,9 @@ index.html                  页面结构
 styles.css                  界面样式
 app.js                      学习流程、进度和小游戏逻辑
 word-data.js                生成后的 2500 字课程数据
+manifest.webmanifest        PWA 安装信息
+service-worker.js           离线缓存逻辑
+icons/                      主屏幕和安装图标
 tools/generate-word-data.js 课程数据生成脚本
 3500-common.txt             常用字来源
 hanzi-pinyin-table.json     拼音来源

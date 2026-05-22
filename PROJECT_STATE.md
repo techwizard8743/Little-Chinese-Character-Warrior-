@@ -1,6 +1,6 @@
 # Project State: Little Chinese Character Warrior
 
-Last updated: 2026-05-21
+Last updated: 2026-05-22
 
 ## Source Of Truth
 
@@ -34,11 +34,15 @@ Core files:
 - `styles.css`: layout and visual design
 - `app.js`: app logic, progress, quiz flow, mini-games
 - `word-data.js`: generated level/character data
+- `manifest.webmanifest`: PWA install metadata
+- `service-worker.js`: offline cache behavior
+- `icons/`: install/home-screen icons
 - `tools/generate-word-data.js`: source generator for `word-data.js`
 - `3500-common.txt`: common character source list
 - `hanzi-pinyin-table.json`: pinyin source table
 
 The app can run by opening `index.html` directly, or by serving the folder locally.
+PWA install/offline support requires the GitHub Pages site or a local HTTP server, not direct `file://` opening.
 
 Useful local preview URL if a static server is running:
 
@@ -64,6 +68,7 @@ http://127.0.0.1:51665/index.html
 - Reward mini-games can be played at most 3 times per level.
 - Reset progress asks for confirmation before clearing saved progress.
 - Progress is stored in browser `localStorage`, so closing the browser preserves progress on the same browser/device.
+- The app can be installed to a phone or desktop home screen as a PWA, and the core game files are cached for offline reopening after the first online visit.
 
 ## Recent Changes
 
@@ -91,6 +96,7 @@ The fake group-word issue was addressed:
 - A hidden parent/developer test mode was added. Open the app with `?debug=1` to jump levels, unlock through a level, mark the current level as mastered, or clear the current level's mini-game play counts for retesting.
 - `README.md` was refreshed for GitHub visitors with the live Pages link, current game behavior, progress-saving notes, and debug-mode instructions.
 - An iPhone polish pass moved the lesson/game flow above the long level map on narrow screens, tightened the learning cards, enlarged touch targets, kept the game pinyin header compact/sticky, added tap/drag control for 接宝箱, and added tap/swipe control for 贪食蛇. On iPhone-sized screens, the small direction button row is hidden so the playing field itself is the control.
+- PWA support was added with `manifest.webmanifest`, `service-worker.js`, SVG/PNG install icons, Apple home-screen metadata, and README install instructions.
 - All `组词` entries currently include the target character.
 - There are no remaining placeholder entries.
 
@@ -105,8 +111,12 @@ As of this note, the expected local modifications for the current task are:
 
 ```text
 app.js
+icons/
+index.html
+manifest.webmanifest
 PROJECT_STATE.md
-styles.css
+README.md
+service-worker.js
 ```
 
 Before publishing, review these files in GitHub Desktop, commit, and push. After the commit, Git should be clean again.
@@ -117,6 +127,7 @@ Run from the project folder:
 
 ```powershell
 node --check app.js
+node --check service-worker.js
 node --check tools\generate-word-data.js
 node --check word-data.js
 node tools\generate-word-data.js
@@ -139,7 +150,7 @@ Git is not available in the normal PATH on this machine. If needed, use GitHub D
 1. Manually test the iPhone layout using the live site or local file with `?debug=1`.
 2. On iPhone, verify 汉字泡泡 taps, 接宝箱 drag control, and 贪食蛇 swipe control.
 3. Commit and push the iPhone polish update after the manual check feels right.
-4. Next planned feature: add PWA support so parents can add the game to the iPhone home screen.
+4. After PWA deployment, test iPhone Safari "Add to Home Screen" from the live GitHub Pages site and reopen once in airplane mode.
 5. iPad-specific layout customization is intentionally postponed.
 
 ## Fresh Session Prompt
@@ -150,5 +161,5 @@ Use this if starting a new thread or switching OpenAI accounts:
 Open this project:
 C:\Users\leene\Documents\GitHub\Little-Chinese-Character-Warrior-
 
-Read PROJECT_STATE.md first. Then inspect git status and continue from the current local files. The 组词 curation is complete for all 2,500 characters. A hidden `?debug=1` test mode and refreshed README were added. The latest local work is an iPhone polish pass with narrow-screen layout changes plus drag control for 接宝箱 and swipe control for 贪食蛇. The next task is probably manual iPhone playtesting, committing/pushing the latest local changes, or adding PWA support, unless I ask for something else.
+Read PROJECT_STATE.md first. Then inspect git status and continue from the current local files. The 组词 curation is complete for all 2,500 characters. A hidden `?debug=1` test mode and refreshed README were added. The latest local work adds PWA install/offline support with a manifest, service worker, icons, and README install instructions. The next task is probably browser/iPhone PWA testing, committing/pushing the latest local changes, or adding the next learning feature, unless I ask for something else.
 ```

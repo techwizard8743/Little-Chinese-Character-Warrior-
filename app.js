@@ -150,10 +150,23 @@ initialize();
 function initialize() {
   attachEvents();
   setupDebugMode();
+  registerServiceWorker();
   elements.snakeHardMode.checked = state.snakeHardMode;
   selectLevel(Math.min(state.progress.unlockedLevel, levels.length));
   updateHeaderStats();
   renderStickerBook();
+}
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator) || window.location.protocol === "file:") {
+    return;
+  }
+
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch(() => {
+      // Offline support should never block the learning game.
+    });
+  });
 }
 
 function attachEvents() {
