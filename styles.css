@@ -1392,9 +1392,8 @@ p {
     grid-template-columns: 1fr;
   }
 
-  .snake-controls .ghost-button {
-    width: 54px;
-    min-height: 44px;
+  .snake-controls {
+    display: none;
   }
 
   .level-grid {

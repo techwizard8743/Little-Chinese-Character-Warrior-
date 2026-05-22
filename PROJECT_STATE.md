@@ -90,7 +90,7 @@ The fake group-word issue was addressed:
 - 汉字泡泡 and 接宝箱 now show short visual feedback: thumbs-up for correct actions and an explosion burst for wrong characters, bombs, or misses.
 - A hidden parent/developer test mode was added. Open the app with `?debug=1` to jump levels, unlock through a level, mark the current level as mastered, or clear the current level's mini-game play counts for retesting.
 - `README.md` was refreshed for GitHub visitors with the live Pages link, current game behavior, progress-saving notes, and debug-mode instructions.
-- An iPhone polish pass moved the lesson/game flow above the long level map on narrow screens, tightened the learning cards, enlarged touch targets, kept the game pinyin header compact/sticky, added drag control for 接宝箱, and added swipe control for 贪食蛇.
+- An iPhone polish pass moved the lesson/game flow above the long level map on narrow screens, tightened the learning cards, enlarged touch targets, kept the game pinyin header compact/sticky, added tap/drag control for 接宝箱, and added tap/swipe control for 贪食蛇. On iPhone-sized screens, the small direction button row is hidden so the playing field itself is the control.
 - All `组词` entries currently include the target character.
 - There are no remaining placeholder entries.
 
